@@ -19,6 +19,7 @@ Then, in this terminal:
     uv run predict-rest
     uv run predict-rest --n 10
     uv run predict-rest --port 5001
+    uv run predict-rest --dataset FD003 --n 10   # score + compare against FD003's ground truth
 """
 import argparse
 

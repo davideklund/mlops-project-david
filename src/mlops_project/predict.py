@@ -12,14 +12,17 @@ By default this scores engines from the FD001 *test* set, as a stand-in for
 used by train.py to compute the `test_rmse` metric logged for the run --
 so the errors printed here should roughly match that logged metric, not
 demonstrate anything new about generalization. For a genuine illustration
-of unseen data, pass --input pointing at a different file (any file with
-the same 26 raw CMAPSS columns).
+of unseen data from a different subset, use --dataset (not --input) so the
+matching RUL_<dataset>.txt is picked up automatically for comparison; use
+--input on its own only for files with no corresponding ground truth.
 
 Usage:
     uv run predict
     uv run predict --n 10
     uv run predict --version 2
-    uv run predict --input data/test_FD003.txt --n 10
+    uv run predict --dataset FD003 --n 10            # score + compare against FD003's ground truth
+    uv run predict --input data/my_engines.txt --n 10  # score a custom file (no RUL comparison
+                                                         # unless --dataset also matches it)
 """
 import argparse
 import os

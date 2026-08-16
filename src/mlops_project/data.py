@@ -46,22 +46,48 @@ def load_scoring_batch(
     """Load a batch of engines' latest readings to score -- used by
     predict.py and predict_via_rest.py to simulate "new data arriving."
 
-    With no `path` given, this defaults to the dataset's test file, in
-    which case the matching true RUL values (from RUL_<dataset>.txt) are
-    returned too, so you can compare your predictions against them.
+    `dataset` controls two independent things: (1) which raw file to load
+    when `path` isn't given (defaults to that dataset's test file), and
+    (2) which RUL_<dataset>.txt to compare predictions against, if it
+    exists and its row count matches the number of engines loaded. Point
+    (2) happens regardless of whether `path` was customized -- so
+    `--dataset FD003 --input some_other_file.txt` will still try to
+    compare against RUL_FD003.txt. If you're scoring a genuinely different
+    file than that dataset's own test set, make sure `--dataset` actually
+    matches what `--input` points at, or the comparison will either be
+    skipped (row-count mismatch) or -- worse -- silently wrong if the
+    counts happen to match by coincidence.
     """
     default_test_path = DATA_DIR / f"test_{dataset}.txt"
     load_path = Path(path) if path is not None else default_test_path
+
+    if path is not None and load_path != default_test_path:
+        print(
+            f"note: loading engines from {load_path.name}, but true-RUL "
+            f"comparison (if any) will use RUL_{dataset}.txt, based on "
+            f"--dataset={dataset}. If {load_path.name} isn't actually from "
+            f"the {dataset} subset, that comparison will be against the "
+            "wrong ground truth -- pass a matching --dataset."
+        )
 
     df = _load_raw(load_path)
     last_row_idx = df.groupby("unit_number")["time_cycles"].idxmax()
     df_last = df.loc[last_row_idx].reset_index(drop=True)
 
     true_rul = None
-    if load_path == default_test_path:
-        rul_path = DATA_DIR / f"RUL_{dataset}.txt"
-        if rul_path.exists():
-            true_rul = pd.read_csv(rul_path, sep=r"\s+", header=None, names=["RUL"])["RUL"]
+    rul_path = DATA_DIR / f"RUL_{dataset}.txt"
+    if rul_path.exists():
+        rul_series = pd.read_csv(rul_path, sep=r"\s+", header=None, names=["RUL"])["RUL"]
+        if len(rul_series) == len(df_last):
+            true_rul = rul_series
+            print(f"(comparing against true RUL from {rul_path.name})")
+        else:
+            print(
+                f"note: {rul_path.name} has {len(rul_series)} entries but "
+                f"{len(df_last)} engines were loaded from {load_path.name} -- "
+                "skipping true-RUL comparison (row counts don't match; "
+                "double check --dataset matches what --input points at)"
+            )
 
     if n is not None:
         df_last = df_last.head(n)
