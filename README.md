@@ -41,6 +41,12 @@ A local MLflow UI is now browsable at `http://127.0.0.1:8880`.
 
 ## Deploying / testing a trained model
 
+To begin with, don't forget to do the following every terminal you use for training, prediction, or serving a model:
+
+```bash
+export MLFLOW_TRACKING_URI=http://127.0.0.1:8880
+```
+
 Once `uv run train` has registered a model (it will be tagged with the `champion` alias automatically -- see `src/mlops_project/data.py` and `train.py`), you can feed it data and see predictions in two ways. Both are already implemented for you (`src/mlops_project/predict.py` and `predict_via_rest.py`) -- you don't need to write this part yourself.
 
 **In-process** -- load the model directly in Python and call `.predict()`:
