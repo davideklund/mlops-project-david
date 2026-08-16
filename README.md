@@ -21,38 +21,23 @@ It is required to install `uv` following [these instructions](https://docs.astra
 
 Run `uv sync` to download the project dependencies. You can then run `uv run jupyter lab` to start a local jupyter server accessible from your browser.
 
-### MLflow tracking URI: two modes, don't mix them
+### Setting up MLflow tracking
 
-MLflow needs to know where to store (and later find) your experiments and registered models. This is controlled by the `MLFLOW_TRACKING_URI` environment variable, and there are two different ways to set it -- pick **one** and use it consistently in every terminal you work in.
+MLflow needs a tracking server running, so you have a web UI to browse experiments and registered models, and so `mlflow models serve` can find your registered models later.
 
-**Option A -- serverless (simplest, no MLflow UI running)**
-
-Point `MLFLOW_TRACKING_URI` directly at a local SQLite file. No server process is needed; MLflow reads/writes the file itself.
-
-```bash
-export MLFLOW_TRACKING_URI=sqlite:///mlruns.db
-uv run train
-```
-
-This is enough to train and register models, but you won't have a live web UI to browse them (though `uv run mlflow ui --backend-store-uri sqlite:///mlruns.db` can still show you a read-only snapshot).
-
-**Option B -- run a tracking server (needed for the web UI, and for model serving)**
-
-Start a server once, which owns the SQLite file itself:
+Start the server once, in its own terminal:
 
 ```bash
 uv run mlflow server --port 8880 --backend-store-uri sqlite:///mlruns.db
 ```
 
-Then, in every *other* terminal you use (for training, prediction, or `mlflow models serve`), point at the **server's address** instead of the file:
+Leave that running. In every *other* terminal you use for this project (training, prediction, or serving a model), point at it by setting:
 
 ```bash
 export MLFLOW_TRACKING_URI=http://127.0.0.1:8880
 ```
 
 A local MLflow UI is now browsable at `http://127.0.0.1:8880`.
-
-**Do not set `MLFLOW_TRACKING_URI` to the `sqlite:///...` file path in a terminal where the server from Option B is also running against that same file.** Having both the server and a client write to the SQLite file directly at the same time can cause "database is locked" errors or inconsistent state. If you're running the server, every client talks to it over HTTP -- never to the file directly.
 
 ## Deploying / testing a trained model
 
@@ -74,7 +59,7 @@ uv run mlflow models serve --model-uri "models:/turbofan_rul_model@champion" --p
 uv run predict-rest
 ```
 
-Both commands accept `--n <count>` to control how many engines are scored, and `--input <path>` to score a different file than the default test set. Make sure `MLFLOW_TRACKING_URI` is set to your server's address (Option B above) in *every* terminal you use for this -- `mlflow models serve` needs it to find the registered model, exactly like `train.py` does.
+Both commands accept `--n <count>` to control how many engines are scored, and `--input <path>` to score a different file than the default test set. Make sure `MLFLOW_TRACKING_URI` is set (see "Setting up MLflow tracking" above) in *every* terminal you use for this -- `mlflow models serve` needs it to find the registered model, exactly like `train.py` does.
 
 ## Getting the code
 
