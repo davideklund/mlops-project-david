@@ -4,15 +4,6 @@ In this hands-on session, you will experience working within the MLOps approach 
 
 You are a team of data scientists / ML engineers tasked to predict failures and estimate remaining lifetime of jet engines. You have been provided with data collected from various engines and need to deploy a model that can predict this.
 
-## Getting the code
-
-You can get this repository either by downloading it directly, or by using git:
-
-- **Download**: use your git host's "Download ZIP" (or similar) option, then unzip it locally.
-- **Git clone**: `git clone <repository-url>` (ask your instructor for the URL). If you don't already have git installed, see the official [installation guide](https://git-scm.com/downloads).
-
-Either way works fine for this course -- git isn't otherwise required for anything below, it's just a convenient way to get (and keep updated with) the files.
-
 ## How to Proceed
 One of the first hands-on steps in the MLOps cycle is iterative exploration and experimentation with data and candidate models. You can do so using notebooks on Jupyter Lab. Start from the provided `exploration.ipynb` notebook. Feel free to experiment with different data analysis techniques and models. Frameworks for machine learning are included in the project already, and you can add more (see below for details).
 
@@ -84,3 +75,9 @@ uv run predict-rest
 ```
 
 Both commands accept `--n <count>` to control how many engines are scored, and `--input <path>` to score a different file than the default test set. Make sure `MLFLOW_TRACKING_URI` is set to your server's address (Option B above) in *every* terminal you use for this -- `mlflow models serve` needs it to find the registered model, exactly like `train.py` does.
+
+## Getting the code
+
+You can get this repository either by downloading it directly ("Download ZIP"), or by using git:
+
+- If you don't already have git installed, see the official [installation guide](https://git-scm.com/downloads).
