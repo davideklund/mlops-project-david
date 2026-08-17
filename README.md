@@ -13,6 +13,10 @@ Whenever you want to (re-)train and register a model, run `uv run train` yoursel
 
 Once a model is registered, you will be able to find it in the MLFlow web UI.
 
+Refer back to the lecture notes or the lecture videos to recall the workflow of MLOps.
+
+![Schematic of MLOps.](flow_image.png "MLOps flow")
+
 ## Included frameworks
 This repository already includes Pandas (data processing), MLFlow (experiment tracking and model registry), and Scikit-learn (ML models) as dependencies, along with Jupyter Lab for exploration. Additional dependencies -- for example XGBoost (decision trees) or Optuna (hyperparameter tuning) -- can be included by using `uv add <package-name>` as your approach develops.
 
