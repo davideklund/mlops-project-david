@@ -9,7 +9,7 @@ One of the first hands-on steps in the MLOps cycle is iterative exploration and 
 
 Once you believe you have a robust data processing and ML training approach, it is time to bring this to production. Modularize your model, data preprocessing and hyperparameter tuning into standalone functions and classes within the project's codebase (i.e., inside `src/mlops_project`). Adapt the code in the `train` function in `train.py` to utilize your model and functions. Remember from the lectures! Minimize code duplication and make sure to use consistently the same code between training and inference. The `src` folder already contains dummy code showcasing how you can use the MLFlow library to define arbitrary models with code for training and inference, and how to register them in the model registry.
 
-Whenever you want to (re-)train and register a model, run `uv run train` yourself (see "Running Locally" below) -- there's no automated pipeline in this version of the project; training happens on demand, on your own machine.
+Whenever you want to (re-)train and register a model, run `uv run train` (see "Running Locally" below).
 
 Once a model is registered, you will be able to find it in the MLFlow web UI.
 
@@ -17,13 +17,15 @@ Refer back to the lecture notes or the lecture videos to recall the workflow of 
 
 ![Schematic of MLOps.](flow_image.png "MLOps flow")
 
-## Included frameworks
-This repository already includes Pandas (data processing), MLFlow (experiment tracking and model registry), and Scikit-learn (ML models) as dependencies, along with Jupyter Lab for exploration. Additional dependencies -- for example XGBoost (decision trees) or Optuna (hyperparameter tuning) -- can be included by using `uv add <package-name>` as your approach develops.
-
 ## Running Locally
+
 It is required to install `uv` following [these instructions](https://docs.astral.sh/uv/getting-started/installation/).
 
-Run `uv sync` to download the project dependencies. You can then run `uv run jupyter lab` to start a local jupyter server accessible from your browser.
+Run `uv sync` to download the project dependencies. As an example, you can then run `uv run jupyter lab` to start a local jupyter server accessible from your browser.
+
+### Included frameworks
+
+This repository already includes Pandas (data processing), MLFlow (experiment tracking and model registry), and Scikit-learn (ML models) as dependencies, along with Jupyter Lab for exploration. Additional dependencies -- for example XGBoost (decision trees) or Optuna (hyperparameter tuning) -- can be included by using `uv add <package-name>` as your approach develops. Then run `uv sync` to download the dependencies.
 
 ### Setting up MLflow tracking
 
@@ -45,7 +47,7 @@ A local MLflow UI is now browsable at `http://127.0.0.1:8880`.
 
 ## Deploying / testing a trained model
 
-To begin with, don't forget to do the following every terminal you use for training, prediction, or serving a model:
+To begin with, don't forget to do the following in every terminal you use for training, prediction, or serving a model:
 
 ```bash
 export MLFLOW_TRACKING_URI=http://127.0.0.1:8880
