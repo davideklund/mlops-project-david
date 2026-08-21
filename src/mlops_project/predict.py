@@ -26,6 +26,7 @@ Usage:
 """
 import argparse
 import os
+from typing import Any
 
 import mlflow
 import pandas as pd
@@ -34,12 +35,14 @@ from .data import MODEL_ALIAS, MODEL_NAME, load_scoring_batch
 
 
 def _model_uri(model_name: str, alias: str | None, version: str | None) -> str:
+    """Build an MLflow model URI: an exact version if given, else an alias."""
     if version:
         return f"models:/{model_name}/{version}"
     return f"models:/{model_name}@{alias}"
 
 
-def _print_results(input_df: pd.DataFrame, predictions, true_rul: pd.Series | None) -> None:
+def _print_results(input_df: pd.DataFrame, predictions: "pd.Series | list | Any", true_rul: pd.Series | None) -> None:
+    """Print a table of predicted (and, if available, true) RUL per engine."""
     result = pd.DataFrame({
         "unit_number": input_df["unit_number"],
         "predicted_RUL": pd.Series(predictions).round(1).values,
@@ -50,7 +53,10 @@ def _print_results(input_df: pd.DataFrame, predictions, true_rul: pd.Series | No
     print(result.to_string(index=False))
 
 
-def main():
+def main() -> None:
+    """CLI entry point (registered as `predict` in pyproject.toml): parse
+    arguments, load the registered model in-process, score a batch of
+    engines, and print the results."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--model-name", default=MODEL_NAME)
     parser.add_argument("--alias", default=MODEL_ALIAS, help="Registry alias to load (ignored if --version is given).")

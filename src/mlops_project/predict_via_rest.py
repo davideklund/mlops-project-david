@@ -22,6 +22,7 @@ Then, in this terminal:
     uv run predict-rest --dataset FD003 --n 10   # score + compare against FD003's ground truth
 """
 import argparse
+from typing import Any
 
 import pandas as pd
 import requests
@@ -29,7 +30,8 @@ import requests
 from .data import load_scoring_batch
 
 
-def _print_results(input_df: pd.DataFrame, predictions, true_rul: pd.Series | None) -> None:
+def _print_results(input_df: pd.DataFrame, predictions: "pd.Series | list | Any", true_rul: pd.Series | None) -> None:
+    """Print a table of predicted (and, if available, true) RUL per engine."""
     result = pd.DataFrame({
         "unit_number": input_df["unit_number"],
         "predicted_RUL": pd.Series(predictions).round(1).values,
@@ -40,7 +42,10 @@ def _print_results(input_df: pd.DataFrame, predictions, true_rul: pd.Series | No
     print(result.to_string(index=False))
 
 
-def main():
+def main() -> None:
+    """CLI entry point (registered as `predict-rest` in pyproject.toml):
+    parse arguments, POST a batch of engines to an already-running
+    `mlflow models serve` endpoint, and print the results."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=5001)
